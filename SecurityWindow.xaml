@@ -1,0 +1,369 @@
+<Window x:Class="Winvexa.SecurityWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Antivirus &amp; Security - Winvexa"
+        Icon="pack://application:,,,/Winvexa;component/winvexa.ico"
+        Width="920" Height="820" MinWidth="760" MinHeight="680"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource WindowBackground}"
+        Closing="SecurityWindow_Closing">
+  <Grid Margin="24">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <Grid Grid.Row="0" Margin="0,0,0,16">
+      <StackPanel>
+        <TextBlock Text="Antivirus &amp; Security" FontSize="25" FontWeight="Bold" />
+        <TextBlock Text="Windows-reported Microsoft Defender protection, scan results, and security intelligence."
+                   Foreground="{DynamicResource MutedBrush}" Margin="0,5,0,0" TextWrapping="Wrap" />
+      </StackPanel>
+      <Button x:Name="OpenWindowsSecurityButton" Content="Open Windows Security"
+              HorizontalAlignment="Right" VerticalAlignment="Center"
+              ToolTip="Open the built-in Windows Security application"
+              Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}"
+              Click="OpenWindowsSecurity_Click" />
+    </Grid>
+
+    <Border Grid.Row="1" Background="{DynamicResource HeroGradient}" BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="1" CornerRadius="15" Padding="18" Margin="0,0,0,14">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <StackPanel>
+          <StackPanel Orientation="Horizontal">
+            <Ellipse x:Name="OverallStatusIndicator" Width="11" Height="11" Fill="#738397"
+                     VerticalAlignment="Center" Margin="0,0,10,0" />
+            <TextBlock x:Name="OverallStatusText" Text="Unable to verify" FontSize="20" FontWeight="Bold" />
+          </StackPanel>
+          <TextBlock x:Name="OverallStatusDetailText" Text="Checking Windows Security status..."
+                     Foreground="{DynamicResource MutedBrush}" Margin="0,7,12,0" TextWrapping="Wrap" />
+        </StackPanel>
+        <Button x:Name="RefreshStatusButton" Grid.Column="1" Content="Refresh status"
+                VerticalAlignment="Center" MinWidth="120"
+                Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}"
+                Click="RefreshStatus_Click" />
+      </Grid>
+    </Border>
+
+    <Border Grid.Row="2" Background="{DynamicResource CardBackground}" BorderBrush="{DynamicResource BorderBrush}"
+            BorderThickness="1" CornerRadius="15" Padding="17" Margin="0,0,0,14">
+      <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <UniformGrid Grid.Row="0" Columns="4">
+          <StackPanel Margin="4">
+            <TextBlock Text="Real-time protection" Foreground="{DynamicResource MutedBrush}" FontSize="12" />
+            <TextBlock x:Name="RealTimeStatusText" Text="Unable to verify" FontWeight="SemiBold" Margin="0,5,0,0" />
+          </StackPanel>
+          <StackPanel Margin="4">
+            <TextBlock Text="Antivirus protection" Foreground="{DynamicResource MutedBrush}" FontSize="12" />
+            <TextBlock x:Name="AntivirusStatusText" Text="Unable to verify" FontWeight="SemiBold" Margin="0,5,0,0" />
+          </StackPanel>
+          <StackPanel Margin="4">
+            <TextBlock Text="Security intelligence" Foreground="{DynamicResource MutedBrush}" FontSize="12" />
+            <TextBlock x:Name="IntelligenceStatusText" Text="Unable to verify" FontWeight="SemiBold" Margin="0,5,0,0" TextWrapping="Wrap" />
+          </StackPanel>
+          <StackPanel Margin="4">
+            <TextBlock Text="Windows Security" Foreground="{DynamicResource MutedBrush}" FontSize="12" />
+            <TextBlock x:Name="WindowsSecurityStatusText" Text="Unable to verify" FontWeight="SemiBold" Margin="0,5,0,0" />
+          </StackPanel>
+        </UniformGrid>
+
+        <Grid Grid.Row="1" Margin="0,14,0,0">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <StackPanel Margin="4,0">
+            <TextBlock Text="Last Quick Scan" Foreground="{DynamicResource MutedBrush}" FontSize="12" />
+            <TextBlock x:Name="LastQuickScanText" Text="Unavailable" Margin="0,4,0,0" />
+          </StackPanel>
+          <StackPanel Grid.Column="1" Margin="4,0">
+            <TextBlock Text="Last Full Scan" Foreground="{DynamicResource MutedBrush}" FontSize="12" />
+            <TextBlock x:Name="LastFullScanText" Text="Unavailable" Margin="0,4,0,0" />
+          </StackPanel>
+        </Grid>
+
+        <Border Grid.Row="2" Background="{DynamicResource SubtleBrush}" CornerRadius="9"
+                Padding="10" Margin="0,13,0,0">
+          <DockPanel>
+            <TextBlock Text="Current threat status" FontWeight="SemiBold" DockPanel.Dock="Left"
+                       Margin="0,0,12,0" />
+            <TextBlock x:Name="ThreatStatusText" Text="Unable to verify" TextWrapping="Wrap" />
+          </DockPanel>
+        </Border>
+      </Grid>
+    </Border>
+
+    <Grid Grid.Row="3">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="Auto" />
+        <RowDefinition Height="*" />
+        <RowDefinition Height="Auto" />
+      </Grid.RowDefinitions>
+      <StackPanel Grid.Row="0">
+        <TextBlock Text="Scan and update" FontSize="16" FontWeight="SemiBold" Margin="2,0,0,8" />
+        <WrapPanel>
+          <Button x:Name="QuickScanButton" Content="Quick Scan" MinWidth="112"
+                  ToolTip="Ask Microsoft Defender to run a quick scan"
+                  Background="{DynamicResource AccentGradient}" Foreground="White" Click="QuickScan_Click" />
+          <Button x:Name="FullScanButton" Content="Full Scan" MinWidth="105"
+                  ToolTip="Ask Microsoft Defender to scan the system"
+                  Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}" Click="FullScan_Click" />
+          <Button x:Name="CustomScanButton" Content="Custom Scan" MinWidth="115"
+                  ToolTip="Choose a location for a Microsoft Defender scan"
+                  Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}" Click="CustomScan_Click" />
+          <Button x:Name="ScanPathButton" Content="Scan This File/Folder" MinWidth="160"
+                  ToolTip="Select a file or folder and scan it with Microsoft Defender"
+                  Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}" Click="ScanPath_Click" />
+          <Button x:Name="UpdateSignaturesButton" Content="Update security intelligence" MinWidth="195"
+                  ToolTip="Request the latest Microsoft Defender security intelligence"
+                  Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}" Click="UpdateSignatures_Click" />
+        </WrapPanel>
+      </StackPanel>
+
+      <Border Grid.Row="1" Background="{DynamicResource SubtleBrush}" CornerRadius="10"
+              Padding="11,9" Margin="0,12,0,12">
+        <DockPanel LastChildFill="True">
+          <Button x:Name="StopButton" Content="Stop" DockPanel.Dock="Right" Visibility="Collapsed"
+                  IsEnabled="False" MinWidth="90" Background="{DynamicResource DangerBackgroundBrush}"
+                  Foreground="{DynamicResource DangerForegroundBrush}" Click="Stop_Click" />
+          <StackPanel>
+            <ProgressBar x:Name="OperationProgress" Height="7" IsIndeterminate="False" Value="0" />
+            <TextBlock x:Name="OperationStatusText" Text="Idle · Choose a security action."
+                       TextWrapping="Wrap" Margin="0,7,10,0" />
+          </StackPanel>
+        </DockPanel>
+      </Border>
+
+      <TabControl Grid.Row="2">
+        <TabItem Header="Activity log">
+          <TextBox x:Name="ActivityLogText" IsReadOnly="True" AcceptsReturn="True"
+                   VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                   TextWrapping="Wrap" FontFamily="Consolas" FontSize="12"
+                   Background="{DynamicResource SubtleBrush}" BorderThickness="0" Padding="11" />
+        </TabItem>
+        <TabItem Header="Protection history">
+          <TextBox x:Name="ProtectionHistoryText" IsReadOnly="True" AcceptsReturn="True"
+                   VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"
+                   Background="{DynamicResource SubtleBrush}" BorderThickness="0" Padding="11" />
+        </TabItem>
+        <TabItem Header="Quarantine">
+          <Grid Margin="12">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Margin="0,0,0,10">
+              <TextBlock Text="Winvexa detection records and isolated files" FontSize="16" FontWeight="SemiBold" />
+              <TextBlock Text="Confirmed local hash matches are quarantined automatically when safe. Suspicious items are recorded for review; no suspicious-only result is automatically removed."
+                         Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" TextWrapping="Wrap" />
+              <WrapPanel Margin="0,8,0,0">
+                <Button x:Name="RefreshQuarantineButton" Content="Refresh" MinWidth="88"
+                        Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}"
+                        Click="RefreshQuarantine_Click" />
+                <Button x:Name="KeepQuarantinedButton" Content="Keep Quarantined" MinWidth="132"
+                        Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}"
+                        Click="KeepQuarantined_Click" />
+                <Button x:Name="RestoreQuarantinedButton" Content="Restore" MinWidth="88"
+                        Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}"
+                        Click="RestoreQuarantined_Click" />
+                <Button x:Name="RestoreAllowButton" Content="Restore and Allow" MinWidth="128"
+                        ToolTip="Restore this exact file and allow its current hash; a changed file will be reassessed"
+                        Background="{DynamicResource DangerBackgroundBrush}" Foreground="{DynamicResource DangerForegroundBrush}"
+                        Click="RestoreAllow_Click" />
+                <Button x:Name="DeleteQuarantinedButton" Content="Delete Permanently" MinWidth="140"
+                        Background="{DynamicResource DangerBackgroundBrush}" Foreground="{DynamicResource DangerForegroundBrush}"
+                        Click="DeleteQuarantined_Click" />
+                <Button x:Name="ViewQuarantineDetailsButton" Content="View Details" MinWidth="98"
+                        Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}"
+                        Click="ViewQuarantineDetails_Click" />
+                <Button x:Name="RemoveAllowanceButton" Content="Remove Allowance" MinWidth="132"
+                        Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}"
+                        Click="RemoveAllowance_Click" />
+              </WrapPanel>
+            </StackPanel>
+            <Grid Grid.Row="1">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="1.2*" />
+              </Grid.ColumnDefinitions>
+              <ListBox x:Name="QuarantineItemsList" Grid.Column="0"
+                       SelectionChanged="QuarantineItemsList_SelectionChanged"
+                       Background="{DynamicResource SubtleBrush}" BorderBrush="{DynamicResource BorderBrush}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="7">
+                      <StackPanel>
+                        <TextBlock Text="{Binding DetectionName}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Status}" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,3,0,0" />
+                        <TextBlock Text="{Binding FileName}" Foreground="{DynamicResource MutedBrush}" FontSize="10"
+                                   TextTrimming="CharacterEllipsis" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+              <TextBox x:Name="QuarantineDetailsText" Grid.Column="2" IsReadOnly="True" AcceptsReturn="True"
+                       VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="Wrap"
+                       Background="{DynamicResource SubtleBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                       Padding="10" Text="Select a detection record or quarantined item to view details." />
+            </Grid>
+            <Expander Grid.Row="2" Header="Security events" Margin="0,10,0,0">
+              <TextBox x:Name="SecurityEventsText" IsReadOnly="True" AcceptsReturn="True"
+                       MaxHeight="140" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"
+                       Background="{DynamicResource SubtleBrush}" BorderThickness="0" Padding="8" />
+            </Expander>
+          </Grid>
+        </TabItem>
+        <TabItem Header="Local threat analysis">
+          <Grid Margin="12">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Margin="0,0,0,10">
+              <TextBlock Text="Read-only local analysis" FontSize="16" FontWeight="SemiBold" />
+              <TextBlock Text="Point-in-time SHA-256, Authenticode, startup-reference, and active IPv4 connection checks. This supplements but does not replace Microsoft Defender."
+                         Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" TextWrapping="Wrap" />
+              <TextBlock x:Name="ThreatKnowledgeBaseStatusText" Text="Knowledge base has not been loaded."
+                         Foreground="{DynamicResource MutedBrush}" Margin="0,5,0,0" TextWrapping="Wrap" />
+              <DockPanel Margin="0,5,0,0">
+                <TextBlock x:Name="ThreatFindingCountText" Text="0 results" FontWeight="SemiBold"
+                           DockPanel.Dock="Right" Margin="10,0,0,0" />
+                <TextBlock x:Name="LocalAnalysisStatusText" Text="Choose a file to analyze or run the harmless demo cases."
+                           Foreground="{DynamicResource MutedBrush}" TextWrapping="Wrap" />
+              </DockPanel>
+            </StackPanel>
+            <WrapPanel Grid.Row="1" Margin="0,0,0,10">
+              <Button x:Name="AnalyzeFileButton" Content="Analyze a file" MinWidth="125"
+                      Background="{DynamicResource AccentGradient}" Foreground="White" Click="AnalyzeFile_Click" />
+              <Button x:Name="RunDemoTestsButton" Content="Run safe DEMO cases" MinWidth="155"
+                      Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}" Click="RunDemoTests_Click" />
+              <Button x:Name="ShowThreatKnowledgeBaseButton" Content="Knowledge base details" MinWidth="165"
+                      Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}" Click="ShowThreatKnowledgeBase_Click" />
+              <Button x:Name="QuarantineButton" Content="Quarantine selected" MinWidth="155"
+                      IsEnabled="False" Background="{DynamicResource DangerBackgroundBrush}"
+                      Foreground="{DynamicResource DangerForegroundBrush}" Click="QuarantineSelected_Click" />
+            </WrapPanel>
+            <Grid Grid.Row="2">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="1.25*" />
+              </Grid.ColumnDefinitions>
+              <ListBox x:Name="LocalFindingsList" Grid.Column="0" SelectionChanged="LocalFindingsList_SelectionChanged"
+                       Background="{DynamicResource SubtleBrush}" BorderBrush="{DynamicResource BorderBrush}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="7">
+                      <StackPanel>
+                        <TextBlock Text="{Binding DetectionName}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding DisplayClassification}" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,3,0,0" />
+                        <TextBlock Text="{Binding FilePath}" Foreground="{DynamicResource MutedBrush}" FontSize="10"
+                                   TextTrimming="CharacterEllipsis" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+              <TextBox x:Name="LocalFindingDetailsText" Grid.Column="2" IsReadOnly="True" AcceptsReturn="True"
+                       VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="Wrap"
+                       Background="{DynamicResource SubtleBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                       Padding="10" Text="Select an analysis result to see the evidence and limits." />
+            </Grid>
+            <Expander Grid.Row="3" Header="Threat knowledge base: categories, capabilities, and sources" Margin="0,10,0,0">
+              <TextBox x:Name="ThreatKnowledgeBaseDetailsText" IsReadOnly="True" AcceptsReturn="True"
+                       MaxHeight="145" VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"
+                       Background="{DynamicResource SubtleBrush}" BorderThickness="0" Padding="8" />
+            </Expander>
+          </Grid>
+        </TabItem>
+        <TabItem Header="Unknown Threat Watchlist">
+          <Grid Margin="12">
+            <Grid.RowDefinitions>
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="Auto" />
+              <RowDefinition Height="*" />
+              <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <StackPanel Grid.Row="0" Margin="0,0,0,10">
+              <TextBlock Text="Unknown program observation" FontSize="16" FontWeight="SemiBold" />
+              <TextBlock Text="Unclassified programs remain usable while Winvexa observes supported process, persistence, signature, and connection indicators. High-confidence evidence is acted on immediately; it never waits for day 30. Completed observation is not a guarantee of safety."
+                         Foreground="{DynamicResource MutedBrush}" Margin="0,4,0,0" TextWrapping="Wrap" />
+              <TextBlock x:Name="WatchlistWorkerStatusText" Text="Checking background watcher status..."
+                         Foreground="{DynamicResource AccentBrush}" Margin="0,6,0,0" TextWrapping="Wrap" />
+            </StackPanel>
+            <WrapPanel Grid.Row="1" Margin="0,0,0,10">
+              <Button x:Name="RefreshWatchlistButton" Content="Refresh" MinWidth="88"
+                      Background="{DynamicResource AccentSoftBrush}" Foreground="{DynamicResource AccentBrush}"
+                      Click="RefreshWatchlist_Click" />
+              <Button x:Name="StopWatchingButton" Content="Stop Watching" MinWidth="115"
+                      Background="{DynamicResource DangerBackgroundBrush}" Foreground="{DynamicResource DangerForegroundBrush}"
+                      IsEnabled="False" Click="StopWatching_Click" />
+            </WrapPanel>
+            <Grid Grid.Row="2">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="1.25*" />
+              </Grid.ColumnDefinitions>
+              <ListBox x:Name="WatchlistItemsList" Grid.Column="0"
+                       SelectionChanged="WatchlistItemsList_SelectionChanged"
+                       Background="{DynamicResource SubtleBrush}" BorderBrush="{DynamicResource BorderBrush}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="7">
+                      <StackPanel>
+                        <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding DisplayStatus}" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,3,0,0" />
+                        <TextBlock Text="{Binding FilePath}" Foreground="{DynamicResource MutedBrush}" FontSize="10"
+                                   TextTrimming="CharacterEllipsis" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+              <TextBox x:Name="WatchlistDetailsText" Grid.Column="2" IsReadOnly="True" AcceptsReturn="True"
+                       VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" TextWrapping="Wrap"
+                       Background="{DynamicResource SubtleBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                       Padding="10" Text="Unknown programs encountered during analysis will appear here when they need longer observation." />
+            </Grid>
+            <Expander Grid.Row="3" Header="Observation history (completed, detected, or stopped)" Margin="0,10,0,0">
+              <ListBox x:Name="WatchlistHistoryList" Height="125"
+                       SelectionChanged="WatchlistHistoryList_SelectionChanged"
+                       Background="{DynamicResource SubtleBrush}" BorderBrush="{DynamicResource BorderBrush}">
+                <ListBox.ItemTemplate>
+                  <DataTemplate>
+                    <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,0,0,1" Padding="7">
+                      <StackPanel>
+                        <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding DisplayStatus}" Foreground="{DynamicResource MutedBrush}" FontSize="11" Margin="0,3,0,0" />
+                        <TextBlock Text="{Binding FilePath}" Foreground="{DynamicResource MutedBrush}" FontSize="10"
+                                   TextTrimming="CharacterEllipsis" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ListBox.ItemTemplate>
+              </ListBox>
+            </Expander>
+          </Grid>
+        </TabItem>
+      </TabControl>
+    </Grid>
+  </Grid>
+</Window>

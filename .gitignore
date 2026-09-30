@@ -1,0 +1,7 @@
+bin/
+obj/
+
+# Keep distribution deliverables available in dist; temporary installer files
+# and compiler logs are not project source.
+dist/*.iss
+dist/*.log

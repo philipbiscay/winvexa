@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>Winvexa</AssemblyName>
+    <RootNamespace>Winvexa</RootNamespace>
+    <Product>Winvexa</Product>
+    <Company>Winvexa</Company>
+    <Authors>Philip Biscay</Authors>
+    <AssemblyTitle>Winvexa</AssemblyTitle>
+    <Description>Winvexa Windows 11 maintenance and repair utility</Description>
+    <Version>1.9.0</Version>
+    <AssemblyVersion>1.9.0.0</AssemblyVersion>
+    <FileVersion>1.9.0.0</FileVersion>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>winvexa.ico</ApplicationIcon>
+    <PublishSingleFile>true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
+  </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="winvexa.ico" />
+    <Content Include="ThreatKnowledgeBase.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <Compile Remove="tests\ProcessRunner.Tests\**\*.cs" />
+  </ItemGroup>
+</Project>
