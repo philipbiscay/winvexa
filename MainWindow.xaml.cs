@@ -92,7 +92,9 @@ public partial class MainWindow : Window
         WriteLog($"Log file: {_logPath}");
 
         _supportedWindows = OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000);
-        var version = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "Unknown";
+        var version = Assembly.GetExecutingAssembly()
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
+            ?? throw new InvalidOperationException("The Winvexa application version metadata is missing.");
         SystemSubtitle.Text = _supportedWindows
             ? $"{GetWindowsVersion()}  •  Version {version}"
             : "This utility is designed for Windows 11. Maintenance actions are disabled on this version of Windows.";

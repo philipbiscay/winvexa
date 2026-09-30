@@ -12,9 +12,6 @@
     <Authors>Philip Biscay</Authors>
     <AssemblyTitle>Winvexa</AssemblyTitle>
     <Description>Winvexa Windows 11 maintenance and repair utility</Description>
-    <Version>1.9.0</Version>
-    <AssemblyVersion>1.9.0.0</AssemblyVersion>
-    <FileVersion>1.9.0.0</FileVersion>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>winvexa.ico</ApplicationIcon>
     <PublishSingleFile>true</PublishSingleFile>
@@ -23,6 +20,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="winvexa.ico" />
+    <EmbeddedResource Include="CHANGELOG.md" />
     <Content Include="ThreatKnowledgeBase.json" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <Compile Remove="tests\ProcessRunner.Tests\**\*.cs" />
   </ItemGroup>

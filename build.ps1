@@ -7,10 +7,13 @@ param(
 $ErrorActionPreference = "Stop"
 $projectDirectory = $PSScriptRoot
 $project = Join-Path $projectDirectory "Winvexa.csproj"
-$projectMetadata = [xml](Get-Content -LiteralPath $project -Raw)
-$version = [string]$projectMetadata.Project.PropertyGroup.Version
+$versioningScript = Join-Path $projectDirectory "Update-WinvexaVersion.ps1"
+if (-not (Test-Path -LiteralPath $versioningScript -PathType Leaf)) {
+    throw "Automatic versioning script is missing: $versioningScript."
+}
+$version = & $versioningScript -ProjectDirectory $projectDirectory
 if ([string]::IsNullOrWhiteSpace($version)) {
-    throw "Could not determine the Winvexa version from $project."
+    throw "Could not determine the Winvexa version from $versioningScript."
 }
 $publishDirectory = Join-Path $projectDirectory "bin\Release\net8.0-windows\$Runtime\publish-$version"
 $installerScript = Join-Path $projectDirectory "installer\Winvexa.iss"
@@ -70,7 +73,8 @@ $compiler = Get-Command ISCC.exe -ErrorAction SilentlyContinue
 if (-not $compiler) {
     $candidates = @(
         (Join-Path ${env:ProgramFiles(x86)} "Inno Setup 6\ISCC.exe"),
-        (Join-Path $env:ProgramFiles "Inno Setup 6\ISCC.exe")
+        (Join-Path $env:ProgramFiles "Inno Setup 6\ISCC.exe"),
+        (Join-Path $env:LOCALAPPDATA "Programs\Inno Setup 6\ISCC.exe")
     )
     $compilerPath = $candidates | Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
 }

@@ -4,7 +4,13 @@ Winvexa is a self-contained Windows desktop utility with a WPF graphical interfa
 
 The dashboard provides Antivirus & Security, a diagnostic-only System Health Check, guided Windows repair, Fix My PC, maintenance tools, results, logs, Settings, and About. Winvexa is an independent Windows utility, not a replacement for Microsoft Defender. Defender remains responsible for system scans and its own remediation; Winvexa also provides a separate, limited local file analyzer and quarantine workflow without changing Defender protections.
 
+From a command prompt, `Winvexa.exe /install` starts the `WinvexaSetup.exe` or `Winvexa-Setup.exe` installer beside the application. Pass an installer path as `/install "C:\path\to\WinvexaSetup.exe"` or configure `WINVEXA_INSTALLER_PATH`. Winvexa uses the standard Windows UAC prompt, waits for setup to exit, and reports the result.
+
 Winvexa's reduced-motion behavior, safe visual transitions, and truthful security/watchlist state labels are specified in [SAFE-ANIMATION-AND-UI-STATE.md](./SAFE-ANIMATION-AND-UI-STATE.md).
+
+## Versioning and release history
+
+`Directory.Build.props` is the single source of Winvexa's Major.Minor version. Each build checks the project-input fingerprint; when tracked inputs change, the minor number increases by exactly one (for example, 1.9 to 1.10 or 2.3 to 2.4), the major number stays unchanged, and [CHANGELOG.md](./CHANGELOG.md) receives a release entry. Rebuilding unchanged inputs does not consume a version. The same Major.Minor value appears in About, product/informational executable metadata, and installer metadata.
 
 ## Prototype, migrated components, and production
 
@@ -86,6 +92,7 @@ Open Command Prompt and run the installed executable with a documented slash opt
 "%ProgramFiles%\Winvexa\Winvexa.exe" /defender
 "%ProgramFiles%\Winvexa\Winvexa.exe" /defender --full
 "%ProgramFiles%\Winvexa\Winvexa.exe" /update
+"%ProgramFiles%\Winvexa\Winvexa.exe" /install "C:\path\to\WinvexaSetup.exe"
 "%ProgramFiles%\Winvexa\Winvexa.exe" /help
 ```
 
@@ -100,6 +107,7 @@ Commands:
 | `/defender` | Update signatures and run a Quick Scan |
 | `/defender --full` | Update signatures and run a Full Scan |
 | `/update` | Scan and diagnose Windows Update; offer confirmed repairs if needed, then ask before each applicable update set and report restart requirements |
+| `/install [path]` | Find and run the Winvexa installer with standard UAC approval; waits for setup and reports the outcome |
 | `/help` | Print commands and exit-code meanings |
 | `/gui` | Open the graphical interface |
 
@@ -166,9 +174,9 @@ Run this from PowerShell in the project folder:
 The script publishes a self-contained single-file `Winvexa.exe` to a versioned build directory, creates both the versioned portable package and the backwards-compatible portable folder, and compiles the x64 installer. Versioned build outputs avoid overwriting a shared publish executable while a prior application process still has it open. It resolves all project inputs relative to `build.ps1`, independent of the current directory or drive letter. Output files:
 
 ```text
-bin\Release\net8.0-windows\win-x64\publish-1.9.0\Winvexa.exe
+bin\Release\net8.0-windows\win-x64\publish-<version>\Winvexa.exe
 dist\Winvexa-Setup.exe
-dist\Winvexa-Portable-1.9.0\Winvexa.exe
+dist\Winvexa-Portable-<version>\Winvexa.exe
 dist\Winvexa-Portable\Winvexa.exe
 dist\Winvexa-Portable\README.txt
 dist\Winvexa-Portable\winvexa.ico

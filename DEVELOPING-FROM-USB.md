@@ -38,6 +38,13 @@ bypass rather than changing machine policy:
 .\build.ps1
 ```
 
+Each build checks a SHA-256 fingerprint of the source, tests, build scripts,
+installer configuration, and release assets. Changed inputs automatically
+increase the minor number by exactly one, update `Directory.Build.props`, and
+add a `CHANGELOG.md` entry. For example, 1.9 becomes 1.10 and 2.3 becomes 2.4.
+The major number is never automatically reset or changed; unchanged inputs do
+not consume another version.
+
 The preflight script reports missing development tools and does not download
 or install software. Use `.\Test-DevelopmentEnvironment.ps1 -SkipInstaller`
 when building only the portable package.
@@ -45,13 +52,15 @@ when building only the portable package.
 The script locates the project, icon, installer definition, publish output,
 and portable instructions relative to its own directory. It does not depend
 on the caller's current directory or a fixed USB drive letter.
+Both build entry points automatically check project fingerprints and advance
+the central Major.Minor version by exactly 0.1 when tracked inputs change.
 
 The default x64 build produces:
 
 ```text
-bin\Release\net8.0-windows\win-x64\publish-1.9.0\Winvexa.exe
+bin\Release\net8.0-windows\win-x64\publish-<version>\Winvexa.exe
 dist\Winvexa-Setup.exe
-dist\Winvexa-Portable-1.9.0\Winvexa.exe
+dist\Winvexa-Portable-<version>\Winvexa.exe
 dist\Winvexa-Portable\Winvexa.exe
 dist\Winvexa-Portable\README.txt
 dist\Winvexa-Portable\winvexa.ico

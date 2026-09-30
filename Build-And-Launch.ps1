@@ -4,10 +4,13 @@ $ErrorActionPreference = 'Stop'
 
 $projectDirectory = $PSScriptRoot
 $projectFile = Join-Path $projectDirectory 'Winvexa.csproj'
-$project = [xml](Get-Content -LiteralPath $projectFile -Raw)
-$version = [string]$project.Project.PropertyGroup.Version
+$versioningScript = Join-Path $projectDirectory 'Update-WinvexaVersion.ps1'
+if (-not (Test-Path -LiteralPath $versioningScript -PathType Leaf)) {
+    throw "Automatic versioning script is missing: '$versioningScript'."
+}
+$version = & $versioningScript -ProjectDirectory $projectDirectory
 if ([string]::IsNullOrWhiteSpace($version)) {
-    throw "Could not determine the application version from '$projectFile'."
+    throw "Could not determine the application version from '$versioningScript'."
 }
 
 $dotnetCandidates = @()

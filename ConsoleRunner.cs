@@ -79,7 +79,12 @@ internal static class ConsoleRunner
 
     public static async Task<int> RunAsync(string[] arguments)
     {
-        var command = ParseCommand(arguments, out var fullScan, out var elevated, out var parseError);
+        var command = ParseCommand(
+            arguments,
+            out var fullScan,
+            out var elevated,
+            out var installerPath,
+            out var parseError);
         if (parseError is not null)
         {
             Console.Error.WriteLine(parseError);
@@ -93,7 +98,6 @@ internal static class ConsoleRunner
         }
 
         var log = new SessionLog();
-        var service = new MaintenanceService(log.Write);
         PrintBanner();
         log.Write($"Windows version: {GetWindowsVersion()}");
         log.Write($"Command: {command}{(fullScan ? " --full" : string.Empty)}");
@@ -105,6 +109,12 @@ internal static class ConsoleRunner
             return (int)ConsoleExitCode.GeneralError;
         }
 
+        if (command == "/install")
+        {
+            return await RunInstallerAsync(installerPath, log);
+        }
+
+        var service = new MaintenanceService(log.Write);
         if (command != "/cleanup" && !IsAdministrator())
         {
             Console.WriteLine();
@@ -169,11 +179,17 @@ internal static class ConsoleRunner
         return (int)report.ExitCode;
     }
 
-    private static string ParseCommand(string[] arguments, out bool fullScan, out bool elevated, out string? error)
+    private static string ParseCommand(
+        string[] arguments,
+        out bool fullScan,
+        out bool elevated,
+        out string? installerPath,
+        out string? error)
     {
         fullScan = false;
         elevated = arguments.Contains("--elevated", StringComparer.OrdinalIgnoreCase);
         var commandArgs = arguments.Where(argument => !string.Equals(argument, "--elevated", StringComparison.OrdinalIgnoreCase)).ToArray();
+        installerPath = null;
         error = null;
         if (commandArgs.Length == 0)
             return "/repair";
@@ -186,12 +202,13 @@ internal static class ConsoleRunner
             "/drives" or "-drives" or "--drives" => "/drives",
             "/defender" or "-defender" or "--defender" => "/defender",
             "/update" or "-update" or "--update" => "/update",
+            "/install" or "-install" or "--install" => "/install",
             "/gui" or "-gui" or "--gui" => "/gui",
             "/help" or "-help" or "--help" or "/?" or "-?" or "--?" => "/help",
             _ => commandArgs[0]
         };
 
-        if (command is not ("/scan" or "/repair" or "/cleanup" or "/drives" or "/defender" or "/update" or "/gui" or "/help"))
+        if (command is not ("/scan" or "/repair" or "/cleanup" or "/drives" or "/defender" or "/update" or "/install" or "/gui" or "/help"))
         {
             error = $"Unknown command: {command}";
             return command;
@@ -205,11 +222,83 @@ internal static class ConsoleRunner
             else if (options.Length > 0)
                 error = "The /defender command accepts only the optional --full flag.";
         }
+        else if (command == "/install")
+        {
+            if (options.Length == 1)
+                installerPath = options[0];
+            else if (options.Length > 1)
+                error = "The /install command accepts one optional installer path.";
+        }
         else if (options.Length > 0)
         {
             error = $"{command} does not accept additional options.";
         }
         return command;
+    }
+
+    private static async Task<int> RunInstallerAsync(string? configuredPath, SessionLog log)
+    {
+        string installerPath;
+        try
+        {
+            installerPath = InstallerCommand.ResolveInstallerPath(
+                configuredPath,
+                AppContext.BaseDirectory);
+        }
+        catch (FileNotFoundException exception)
+        {
+            Console.Error.WriteLine(exception.Message);
+            log.Write(exception.Message);
+            return (int)ConsoleExitCode.GeneralError;
+        }
+        catch (Exception exception) when (
+            exception is ArgumentException or IOException or UnauthorizedAccessException or NotSupportedException)
+        {
+            var message = $"Could not locate the Winvexa installer: {exception.Message}";
+            Console.Error.WriteLine(message);
+            log.Write(message);
+            return (int)ConsoleExitCode.GeneralError;
+        }
+
+        Console.WriteLine($"Starting the Winvexa installer: {installerPath}");
+        log.Write($"Starting the Winvexa installer with the standard Windows UAC prompt: {installerPath}");
+        try
+        {
+            using var installer = Process.Start(InstallerCommand.CreateStartInfo(installerPath))
+                ?? throw new InvalidOperationException("Windows did not start the Winvexa installer.");
+            Console.WriteLine("Waiting for the installer to finish...");
+            await installer.WaitForExitAsync();
+
+            if (installer.ExitCode == 0)
+            {
+                const string successMessage = "Winvexa installation completed successfully.";
+                Console.WriteLine(successMessage);
+                log.Write(successMessage);
+                return (int)ConsoleExitCode.Success;
+            }
+
+            var failureMessage =
+                $"The Winvexa installer did not complete successfully (exit code {installer.ExitCode}).";
+            Console.Error.WriteLine(failureMessage);
+            log.Write(failureMessage);
+            return (int)ConsoleExitCode.GeneralError;
+        }
+        catch (System.ComponentModel.Win32Exception exception) when (exception.NativeErrorCode == 1223)
+        {
+            const string cancelledMessage = "Windows administrator permission was declined; Winvexa was not installed.";
+            Console.WriteLine(cancelledMessage);
+            log.Write(cancelledMessage);
+            return (int)ConsoleExitCode.AdministratorRequired;
+        }
+        catch (Exception exception) when (
+            exception is InvalidOperationException or System.ComponentModel.Win32Exception or IOException or
+                UnauthorizedAccessException or ArgumentException)
+        {
+            var failureMessage = $"Could not start the Winvexa installer: {exception.Message}";
+            Console.Error.WriteLine(failureMessage);
+            log.Write(failureMessage);
+            return (int)ConsoleExitCode.GeneralError;
+        }
     }
 
     private static async Task<int> RequestElevationAsync(string command, bool fullScan, bool alreadyElevated, SessionLog log)
@@ -854,8 +943,12 @@ internal static class ConsoleRunner
               Winvexa.exe /defender       Update Defender signatures and Quick Scan
               Winvexa.exe /defender --full  Run a confirmed Full Scan
               Winvexa.exe /update         Check for updates and ask before installing
+              Winvexa.exe /install [path] Install from WinvexaSetup.exe or the specified installer
               Winvexa.exe /help           Show this help
               Winvexa.exe /gui            Open the graphical interface
+
+              Installer path:
+                WINVEXA_INSTALLER_PATH   Optional path to WinvexaSetup.exe
 
             Exit codes:
                0  Successful

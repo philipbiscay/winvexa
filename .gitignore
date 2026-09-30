@@ -1,5 +1,6 @@
 bin/
 obj/
+.versioning-state.lock*
 
 # Keep distribution deliverables available in dist; temporary installer files
 # and compiler logs are not project source.
